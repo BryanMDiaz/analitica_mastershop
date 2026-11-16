@@ -1,0 +1,153 @@
+/* ========================================================== */
+/* TABLERO DE CONTROL - ANALÍTICA MASTERSHOP                  */
+/* ========================================================== */
+
+.o_mastershop_dashboard {
+    background-color: #f8fafc;
+    height: 100%;
+    max-height: 100%;
+    overflow-y: auto !important;
+    overflow-x: hidden;
+    flex: 1 1 100%;
+    padding-bottom: 4rem !important;
+
+    .o_kpi_card {
+        background: #ffffff;
+        transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.22s ease;
+        border-radius: 14px !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 4px 12px rgba(15, 23, 42, 0.03) !important;
+        position: relative;
+        overflow: hidden;
+
+        &:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -2px rgba(15, 23, 42, 0.04) !important;
+            border-color: #cbd5e1 !important;
+        }
+
+        &.o_kpi_blue {
+            border-top: 3.5px solid #2563eb !important;
+        }
+        &.o_kpi_green {
+            border-top: 3.5px solid #059669 !important;
+        }
+        &.o_kpi_amber {
+            border-top: 3.5px solid #d97706 !important;
+        }
+        &.o_kpi_purple {
+            border-top: 3.5px solid #7c3aed !important;
+        }
+    }
+
+    .o_kpi_icon_wrapper {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.05rem;
+    }
+
+    .o_kpi_title {
+        font-size: 0.69rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: #64748b;
+    }
+
+    .o_kpi_main_num {
+        font-size: 1.85rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        line-height: 1.15;
+        color: #0f172a;
+        margin-top: 0.2rem;
+        margin-bottom: 0.45rem;
+    }
+
+    /* Executive Sub-badge Row */
+    .o_exec_subbadge {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        padding: 5px 9px;
+        font-size: 0.77rem;
+        color: #334155;
+        margin-bottom: 0.85rem;
+
+        &.o_subbadge_green {
+            background: #f0fdf4 !important;
+            border-color: #dcfce7 !important;
+            color: #166534 !important;
+        }
+
+        &.o_subbadge_amber {
+            background: #fffbeb !important;
+            border-color: #fef3c7 !important;
+            color: #92400e !important;
+        }
+
+        &.o_subbadge_purple {
+            background: #faf5ff !important;
+            border-color: #f3e8ff !important;
+            color: #6b21a8 !important;
+        }
+    }
+
+    /* Distribution Progress Bar */
+    .o_progress_distribution {
+        height: 8px;
+        background-color: #e2e8f0;
+        border-radius: 4px;
+        overflow: hidden;
+        display: flex;
+    }
+
+    .o_trend_badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 7px;
+        border-radius: 6px;
+        font-size: 0.73rem;
+        font-weight: 700;
+
+        &.o_trend_up {
+            background-color: #dcfce7;
+            color: #15803d;
+        }
+        &.o_trend_down {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+    }
+
+    .o_donut_circle {
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    .o_donut_inner {
+        width: 78px;
+        height: 78px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .cursor-pointer {
+        cursor: pointer;
+    }
+}
+

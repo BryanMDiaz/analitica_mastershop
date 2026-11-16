@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-inherit="point_of_sale.ControlButtons" t-inherit-mode="extension">
+        <xpath expr="//button[hasclass('more-btn')]" position="before">
+            <button t-if="!props.showRemainingButtons"
+                    class="btn btn-light btn-lg lh-lg text-truncate w-auto js_select_vendedor ms-1"
+                    t-on-click="() => this.clickSelectVendedor()"
+                    title="Asignar Vendedor comisionista a la orden">
+                <i class="fa fa-user me-1 text-primary"/>
+                <t t-if="currentVendedor">
+                    <span class="text-primary fw-bold" t-esc="currentVendedor.name"/>
+                </t>
+                <t t-else="">
+                    <span class="text-muted">Vendedor</span>
+                </t>
+            </button>
+        </xpath>
+        <xpath expr="//div[hasclass('control-buttons-modal')]" position="inside">
+            <button class="btn btn-secondary btn-lg py-5 js_select_vendedor_modal"
+                    t-on-click="() => this.clickSelectVendedor()">
+                <i class="fa fa-user me-1"/>
+                <t t-if="currentVendedor">
+                    Vendedor: <t t-esc="currentVendedor.name"/>
+                </t>
+                <t t-else="">
+                    Asignar Vendedor
+                </t>
+            </button>
+        </xpath>
+    </t>
+</templates>

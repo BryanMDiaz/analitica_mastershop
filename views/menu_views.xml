@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Menú Principal Raíz que se muestra en el Tablero de Aplicaciones -->
+    <menuitem id="menu_analitica_mastershop_root"
+              name="Analítica MasterShop"
+              web_icon="analitica_mastershop,static/description/icon.png"
+              action="action_mastershop_dashboard"
+              sequence="46"/>
+
+    <!-- Submenús Principales en la Barra Superior -->
+    <menuitem id="menu_analitica_mastershop_dashboard"
+              name="Tablero de Control"
+              parent="menu_analitica_mastershop_root"
+              action="action_mastershop_dashboard"
+              sequence="1"/>
+
+    <menuitem id="menu_analitica_mastershop_clientes"
+              name="Clientes MasterShop"
+              parent="menu_analitica_mastershop_root"
+              action="action_analitica_mastershop_clientes"
+              sequence="5"/>
+
+    <menuitem id="menu_analitica_mastershop_reportes"
+              name="Reportes de Ventas"
+              parent="menu_analitica_mastershop_root"
+              action="action_mastershop_reportes_ventas"
+              sequence="5"/>
+
+    <menuitem id="menu_analitica_mastershop_inventario"
+              name="Inventario"
+              parent="menu_analitica_mastershop_root"
+              action="action_mastershop_inventario"
+              sequence="10"/>
+
+    <menuitem id="menu_analitica_mastershop_comisiones"
+              name="Comisiones"
+              parent="menu_analitica_mastershop_root"
+              action="action_mastershop_comisiones"
+              sequence="15"/>
+    <menuitem id="menu_mastershop_comision_reglas" name="Porcentajes y grupos"
+              parent="menu_analitica_mastershop_root" action="action_mastershop_comision_reglas"
+              sequence="16"/>
+</odoo>

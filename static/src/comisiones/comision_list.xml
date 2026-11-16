@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="analitica_mastershop.ComisionListView" t-inherit="web.ListView" t-inherit-mode="primary">
+        <xpath expr="//div[@t-ref='root']" position="attributes">
+            <attribute name="class">o_mastershop_commissions</attribute>
+        </xpath>
+        <xpath expr="//t[@t-component='props.Renderer']" position="before">
+            <div t-if="!deducciones.loading" class="o_mastershop_liquidacion">
+                <div class="o_mastershop_liquidacion_info">
+                    <strong>Opciones de liquidación</strong>
+                    <span class="text-muted small">Aplican a todos los vendedores de <t t-esc="deducciones.company_name"/></span>
+                </div>
+                <div class="o_mastershop_liquidacion_controls">
+                    <label class="o_mastershop_tax" t-att-class="{'is-active': deducciones.iva}">
+                        <input type="checkbox" class="form-check-input m-0"
+                               t-att-checked="deducciones.iva" t-att-disabled="deducciones.busy || !deducciones.can_edit"
+                               t-on-change="(ev) => this.cambiarDeduccion('iva', ev)"/>
+                        <span>IVA <strong>13%</strong></span>
+                    </label>
+                    <label class="o_mastershop_tax" t-att-class="{'is-active': deducciones.renta}">
+                        <input type="checkbox" class="form-check-input m-0"
+                               t-att-checked="deducciones.renta" t-att-disabled="deducciones.busy || !deducciones.can_edit"
+                               t-on-change="(ev) => this.cambiarDeduccion('renta', ev)"/>
+                        <span>Renta <strong>10%</strong></span>
+                    </label>
+                    <button type="button" class="btn btn-primary text-nowrap" t-on-click="abrirPorcentajes">
+                        <i class="fa fa-users me-1" aria-hidden="true"/> Porcentajes y grupos
+                    </button>
+                </div>
+            </div>
+        </xpath>
+    </t>
+</templates>

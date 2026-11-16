@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ============================================================ -->
+    <!-- WIZARD: REGISTRAR NUEVO DESCUENTO DIRECTO                     -->
+    <!-- ============================================================ -->
+    <record id="view_mastershop_comision_descuento_wizard_form" model="ir.ui.view">
+        <field name="name">mastershop.comision.descuento.wizard.form</field>
+        <field name="model">mastershop.comision.descuento.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Registrar descuento">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="vendedor_id" widget="many2one_avatar_employee"/>
+                            <field name="fecha"/>
+                        </group>
+                        <group>
+                            <field name="monto" widget="monetary"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="motivo" placeholder="Ej. Envío cancelado por cliente, flete $4.00 sábado..."/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_aplicar_descuento"
+                            string="Aplicar Descuento"
+                            type="object"
+                            class="btn-primary"/>
+                    <button string="Cancelar"
+                            class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- GESTIÓN DE DESCUENTOS / ENVÍOS (HISTORIAL Y EDICIÓN)          -->
+    <!-- ============================================================ -->
+    <record id="view_mastershop_comision_descuento_tree" model="ir.ui.view">
+        <field name="name">mastershop.comision.descuento.list</field>
+        <field name="model">mastershop.comision.descuento</field>
+        <field name="arch" type="xml">
+            <list string="Historial de descuentos" editable="bottom" create="1" edit="1" delete="1">
+                <field name="fecha"/>
+                <field name="vendedor_id" column_invisible="True"/>
+                <field name="motivo"/>
+                <field name="monto" widget="monetary" sum="Total Descontado"/>
+                <button name="action_eliminar_descuento" string="Eliminar descuento"
+                        type="object" icon="fa-trash" class="btn-outline-danger btn-sm"
+                        confirm="¿Eliminar este descuento? El importe se reintegrará al total del vendedor."
+                        help="Eliminar un descuento registrado por error y recalcular el total"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_mastershop_comision_descuento_form" model="ir.ui.view">
+        <field name="name">mastershop.comision.descuento.form</field>
+        <field name="model">mastershop.comision.descuento</field>
+        <field name="arch" type="xml">
+            <form string="Descuento">
+                <sheet>
+                    <group>
+                        <field name="vendedor_id"/>
+                        <field name="fecha"/>
+                        <field name="motivo"/>
+                        <field name="monto"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- SECCIÓN: COMISIONES MASTERSHOP                               -->
+    <!-- ============================================================ -->
+
+    <record id="view_mastershop_comision_regla_kanban" model="ir.ui.view">
+        <field name="name">mastershop.comision.regla.kanban</field>
+        <field name="model">mastershop.comision.regla</field>
+        <field name="arch" type="xml">
+            <kanban class="o_mastershop_reglas" quick_create="false" records_draggable="false">
+                <field name="tipo"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <field name="tipo" class="badge text-bg-light"/>
+                            <span class="fs-2 fw-bold text-primary"><field name="porcentaje"/>%</span>
+                        </div>
+                        <field name="name" class="fw-bold fs-5 mb-2"/>
+                        <div class="text-muted small" invisible="tipo != 'grupo'"><field name="cantidad_vendedores"/> personas</div>
+                        <field name="vendedor_ids" widget="many2many_tags" invisible="tipo != 'grupo'"/>
+                        <field name="vendedor_id" invisible="tipo != 'individual'"/>
+                        <span class="text-muted" invisible="tipo != 'temporada'">Todos los vendedores de la compañía</span>
+                        <div class="d-flex gap-1 text-muted small mt-3">
+                            <span>Desde</span><field name="fecha_inicio"/>
+                            <span t-if="record.fecha_fin.raw_value">hasta</span>
+                            <field name="fecha_fin"/>
+                            <span t-if="!record.fecha_fin.raw_value">· sin vencimiento</span>
+                        </div>
+                        <field name="company_id" groups="base.group_multi_company" class="text-muted small mt-1"/>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+    <record id="view_mastershop_comision_regla_list" model="ir.ui.view">
+        <field name="name">mastershop.comision.regla.list</field>
+        <field name="model">mastershop.comision.regla</field>
+        <field name="arch" type="xml">
+            <list string="Porcentajes y grupos">
+                <field name="name"/>
+                <field name="tipo"/>
+                <field name="porcentaje"/>
+                <field name="vendedor_ids" widget="many2many_tags" optional="show"/>
+                <field name="vendedor_id" optional="show"/>
+                <field name="fecha_inicio"/>
+                <field name="fecha_fin"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_mastershop_comision_regla_form" model="ir.ui.view">
+        <field name="name">mastershop.comision.regla.form</field>
+        <field name="model">mastershop.comision.regla</field>
+        <field name="arch" type="xml">
+            <form string="Porcentaje de comisión">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Ej. Equipo de ventas · comisión 5%"/></h1>
+                    </div>
+                    <group>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                        <field name="company_id" invisible="1" groups="!base.group_multi_company"/>
+                        <field name="tipo" widget="radio" options="{'horizontal': true}"/>
+                    </group>
+                    <group>
+                        <group string="1. Selecciona las personas">
+                            <field name="vendedor_ids" widget="many2many_tags"
+                                   invisible="tipo != 'grupo'" required="tipo == 'grupo'"
+                                   domain="[('company_id', '=', company_id)]"
+                                   options="{'no_create': True}" placeholder="Selecciona varias personas para este grupo..."/>
+                            <field name="vendedor_id" invisible="tipo != 'individual'" required="tipo == 'individual'"
+                                   domain="[('company_id', '=', company_id)]" options="{'no_create': True}"/>
+                            <div class="text-muted" invisible="tipo != 'temporada'">
+                                Este porcentaje se aplicará a todos los vendedores de la compañía durante estas fechas.
+                            </div>
+                        </group>
+                        <group string="2. Define el porcentaje y las fechas">
+                            <field name="porcentaje" help="Escribe 5 para aplicar 5% o 10 para aplicar 10%."/>
+                            <field name="fecha_inicio"/>
+                            <field name="fecha_fin" placeholder="Sin vencimiento"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-light border mt-3 mb-0" role="note">
+                        <strong>Prioridad:</strong> temporada para todos → excepción individual → porcentaje del grupo.
+                        <br/>Las fechas se comparan con la fecha de factura. Cambiar integrantes o reglas recalcula el histórico.
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_mastershop_comision_regla_search" model="ir.ui.view">
+        <field name="name">mastershop.comision.regla.search</field>
+        <field name="model">mastershop.comision.regla</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="vendedor_ids" string="Persona del grupo"/>
+                <field name="vendedor_id"/>
+                <filter name="grupos" string="Grupos" domain="[('tipo', '=', 'grupo')]"/>
+                <filter name="individuales" string="Individuales" domain="[('tipo', '=', 'individual')]"/>
+                <filter name="temporadas" string="Temporadas" domain="[('tipo', '=', 'temporada')]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter name="tipo" string="Aplicar a" context="{'group_by': 'tipo'}"/>
+                    <filter name="porcentaje" string="Porcentaje" context="{'group_by': 'porcentaje'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="action_mastershop_comision_reglas" model="ir.actions.act_window">
+        <field name="name">Porcentajes y grupos</field>
+        <field name="res_model">mastershop.comision.regla</field>
+        <field name="context">{'create': True}</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_mastershop_comision_regla_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Un porcentaje para varias personas</p>
+            <p>Pulsa Nuevo, elige «Un grupo de personas», selecciona sus integrantes y define el porcentaje.</p>
+            <p>También puedes asignar un porcentaje individual o crear una temporada para todos.</p>
+        </field>
+    </record>
+
+    <!-- Vista Lista Principal de Comisiones -->
+    <record id="view_mastershop_comision_list" model="ir.ui.view">
+        <field name="name">mastershop.comision.reporte.list</field>
+        <field name="model">mastershop.comision.reporte</field>
+        <field name="arch" type="xml">
+            <list string="Comisiones MasterShop" js_class="mastershop_comisiones"
+                  create="0" edit="0" delete="0"
+                  default_order="total_neto desc"
+                  sample="1" decoration-warning="sin_porcentaje &gt; 0">
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="vendedor_id"
+                       string="Vendedor Comisionista"
+                       decoration-bf="1"
+                       widget="many2one_avatar_employee"/>
+                <field name="total_facturas"
+                       string="Facturas"
+                       sum="Total Facturas"/>
+                <field name="total_devoluciones" widget="monetary"
+                       string="Devoluciones"
+                       sum="Total Devoluciones"
+                       optional="hide"/>
+                <field name="total_ventas"
+                       string="Ventas"
+                       widget="monetary"
+                       sum="Total General"
+                       decoration-success="total_ventas &gt; 0"
+                       decoration-bf="1"/>
+                <field name="total_comision" string="Comisión" widget="monetary" sum="Total Comisiones"/>
+                <field name="total_iva" widget="monetary" sum="Total IVA"/>
+                <field name="total_renta" widget="monetary" sum="Total Renta"
+                       help="Renta fija del 10% sobre la comisión generada del vendedor."/>
+                <field name="sin_porcentaje" string="Sin %" sum="Sin porcentaje"
+                       help="Documentos sin regla vigente: generan comisión cero. Configure los porcentajes antes de liquidar."/>
+                <field name="total_descuentos"
+                       string="Descuentos"
+                       widget="monetary"
+                       sum="Total Descuentos"
+                       decoration-danger="total_descuentos &gt; 0"
+                       decoration-bf="1"/>
+                <field name="total_neto"
+                       string="A pagar"
+                       widget="monetary"
+                       sum="Neto General"
+                       decoration-success="total_neto &gt; 0"
+                       decoration-danger="total_neto &lt; 0"
+                       decoration-bf="1"/>
+                <button name="action_configurar_porcentaje" string="Asignar %" type="object"
+                        icon="fa-percent" class="btn-outline-warning btn-sm" invisible="sin_porcentaje == 0"
+                        groups="analitica_mastershop.group_analitica_mastershop_manager"
+                        help="Hay facturas sin porcentaje. Asigna una regla individual o selecciona un grupo."/>
+                <button name="action_agregar_descuento_modal"
+                        string="Descontar"
+                        type="object"
+                        icon="fa-minus-circle"
+                        class="btn-danger btn-sm"
+                        help="Registrar un descuento o envío para este vendedor"/>
+                <button name="action_gestionar_descuentos"
+                        type="object"
+                        icon="fa-list"
+                        class="btn-secondary btn-sm"
+                        help="Ver o editar todos los descuentos de este vendedor"/>
+                <button name="action_ver_facturas"
+                        string="Facturas"
+                        type="object"
+                        icon="fa-file-text-o"
+                        class="btn-secondary btn-sm"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Vista Gráfico de Comisiones -->
+    <record id="view_mastershop_comision_graph" model="ir.ui.view">
+        <field name="name">mastershop.comision.reporte.graph</field>
+        <field name="model">mastershop.comision.reporte</field>
+        <field name="arch" type="xml">
+            <graph string="Comisiones por Vendedor" type="bar" sample="1">
+                <field name="vendedor_id" type="row"/>
+                <field name="total_ventas" type="measure" string="Total Ventas"/>
+                <field name="total_descuentos" type="measure" string="Descuentos"/>
+                <field name="total_comision" type="measure" string="Comisión generada"/>
+                <field name="total_neto" type="measure" string="Neto a Liquidar"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Vista Búsqueda / Filtros -->
+    <record id="view_mastershop_comision_search" model="ir.ui.view">
+        <field name="name">mastershop.comision.reporte.search</field>
+        <field name="model">mastershop.comision.reporte</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Comisiones">
+                <field name="vendedor_id" string="Vendedor Comisionista"/>
+                <filter name="sin_porcentaje" string="Falta configurar porcentaje" domain="[('sin_porcentaje', '&gt;', 0)]"/>
+                <group expand="0" string="Agrupar Por">
+                    <filter string="Vendedor"
+                            name="group_vendedor"
+                            context="{'group_by': 'vendedor_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Acción de Ventana -->
+    <record id="action_mastershop_comisiones" model="ir.actions.act_window">
+        <field name="name">Comisiones</field>
+        <field name="res_model">mastershop.comision.reporte</field>
+        <field name="view_mode">list,graph</field>
+        <field name="search_view_id" ref="view_mastershop_comision_search"/>
+        <field name="context">{'create': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay ventas con vendedor comisionista asignado aún.
+            </p>
+            <p>
+                Neto a liquidar = comisión menos IVA 13% y renta 10% activados, y menos descuentos manuales.
+                Configure porcentajes individuales y temporadas con fechas de vigencia.
+                Las comisiones se generan automáticamente cuando una venta
+                (desde Punto de Venta o Contabilidad) tiene asignado un
+                <strong>Vendedor Comisionista</strong>.
+            </p>
+        </field>
+    </record>
+</odoo>

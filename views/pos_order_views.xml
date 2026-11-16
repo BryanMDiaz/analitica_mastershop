@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Vista Formulario de Pedidos POS: Mostrar Vendedor Comisionista -->
+        <record id="view_pos_order_form_inherit_mastershop" model="ir.ui.view">
+            <field name="name">pos.order.form.inherit.mastershop</field>
+            <field name="model">pos.order</field>
+            <field name="inherit_id" ref="point_of_sale.view_pos_pos_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="vendedor_id" widget="many2one_avatar_employee" placeholder="Seleccionar vendedor..."/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Vista Lista de Pedidos POS: Columna Vendedor -->
+        <record id="view_pos_order_tree_inherit_mastershop" model="ir.ui.view">
+            <field name="name">pos.order.tree.inherit.mastershop</field>
+            <field name="model">pos.order</field>
+            <field name="inherit_id" ref="point_of_sale.view_pos_order_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="vendedor_id" widget="many2one_avatar_employee" optional="show"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Vista Búsqueda de Pedidos POS: Filtro y Agrupación por Vendedor -->
+        <record id="view_pos_order_search_inherit_mastershop" model="ir.ui.view">
+            <field name="name">pos.order.search.inherit.mastershop</field>
+            <field name="model">pos.order</field>
+            <field name="inherit_id" ref="point_of_sale.view_pos_order_search"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='config_id']" position="after">
+                    <field name="vendedor_id" string="Vendedor (Comisión)"/>
+                    <group expand="0" string="Agrupar por">
+                        <filter string="Vendedor (Comisión)" name="group_vendedor" context="{'group_by': 'vendedor_id'}"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Vista Formulario de Factura: Mostrar Vendedor Comisionista -->
+        <record id="view_move_form_inherit_mastershop_vendedor" model="ir.ui.view">
+            <field name="name">account.move.form.inherit.mastershop.vendedor</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='invoice_user_id']" position="after">
+                    <field name="vendedor_id"
+                           string="Vendedor Comisionista"
+                           widget="many2one_avatar_employee"
+                           domain="[('is_vendedor_mastershop', '=', True)]"
+                           invisible="move_type not in ('out_invoice', 'out_refund')"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Vista Lista de Facturas: Columna Vendedor Comisionista -->
+        <record id="view_move_list_inherit_mastershop_vendedor" model="ir.ui.view">
+            <field name="name">account.move.list.inherit.mastershop.vendedor</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_invoice_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='invoice_user_id']" position="after">
+                    <field name="vendedor_id"
+                           string="Vendedor Comisionista"
+                           optional="show"
+                           column_invisible="context.get('default_move_type') not in ('out_invoice', 'out_refund', False)"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista Lista de Clientes MasterShop -->
+    <record id="view_analitica_mastershop_clientes_list" model="ir.ui.view">
+        <field name="name">analitica.mastershop.clientes.list</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <list string="Clientes MasterShop" create="0" edit="0" delete="0">
+                <field name="mastershop_currency_id" column_invisible="True"/>
+                <field name="name" string="Cliente"/>
+                <field name="mobile" string="Celular" optional="show"/>
+                <field name="email" string="Correo" optional="hide"/>
+                <field name="city" string="Ciudad / Depto." optional="show"/>
+                <field name="state_id" string="Departamento" optional="hide"/>
+                <field name="mastershop_last_sale_date" string="Fecha Últ. Venta"/>
+                <field name="mastershop_last_sale_amount" string="Monto Últ. Venta"/>
+                <field name="mastershop_total_sales" string="Total Histórico"/>
+                <field name="mastershop_invoice_count" string="Cant. Facturas"/>
+                <field name="mastershop_average_ticket" string="Gasto Promedio"/>
+                <button name="action_view_mastershop_invoices" type="object" string="Facturas" icon="fa-file-text-o"/>
+                <field name="mastershop_days_since_sale" string="Días sin Compra" widget="badge"
+                       decoration-success="mastershop_days_since_sale &lt;= 30 and mastershop_last_sale_date"
+                       decoration-warning="mastershop_days_since_sale &gt; 30 and mastershop_days_since_sale &lt;= 90 and mastershop_last_sale_date"
+                       decoration-danger="mastershop_days_since_sale &gt; 90 and mastershop_last_sale_date"
+                       invisible="not mastershop_last_sale_date"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Vista Búsqueda / Filtros Clientes MasterShop -->
+    <record id="view_analitica_mastershop_clientes_search" model="ir.ui.view">
+        <field name="name">analitica.mastershop.clientes.search</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <search string="Filtros Clientes MasterShop">
+                <field name="name" string="Cliente"/>
+                <field name="mobile" string="Celular"/>
+                <field name="email" string="Correo"/>
+                <field name="city" string="Ciudad / Depto."/>
+
+                <separator/>
+                <filter string="Activos (Verde ≤ 30 días)" name="filter_active"
+                        domain="[('mastershop_days_since_sale', '&lt;=', 30), ('mastershop_last_sale_date', '!=', False)]"/>
+                <filter string="Medio Activos (Naranja 31-90 días)" name="filter_semi_active"
+                        domain="[('mastershop_days_since_sale', '&gt;', 30), ('mastershop_days_since_sale', '&lt;=', 90), ('mastershop_last_sale_date', '!=', False)]"/>
+                <filter string="Inactivos (Rojo &gt; 90 días)" name="filter_inactive"
+                        domain="['|', ('mastershop_days_since_sale', '&gt;', 90), ('mastershop_last_sale_date', '=', False)]"/>
+                <separator/>
+                <filter string="Con Facturas" name="filter_with_invoices"
+                        domain="[('mastershop_invoice_count', '&gt;', 0)]"/>
+                <filter string="Sin Facturas" name="filter_without_invoices"
+                        domain="[('mastershop_invoice_count', '=', 0)]"/>
+                <separator/>
+                <filter string="Con Pedidos de Venta" name="filter_with_orders"
+                        domain="[('mastershop_sale_count', '&gt;', 0)]"/>
+
+                <separator/>
+                <!-- Departamentos de El Salvador -->
+                <filter string="📍 Ahuachapán" name="dept_ahuachapan" domain="[('city', 'ilike', 'Ahuachapán')]"/>
+                <filter string="📍 Cabañas" name="dept_cabanas" domain="[('city', 'ilike', 'Cabañas')]"/>
+                <filter string="📍 Chalatenango" name="dept_chalatenango" domain="[('city', 'ilike', 'Chalatenango')]"/>
+                <filter string="📍 Cuscatlán" name="dept_cuscatlan" domain="[('city', 'ilike', 'Cuscatlán')]"/>
+                <filter string="📍 La Libertad" name="dept_lalibertad" domain="[('city', 'ilike', 'La Libertad')]"/>
+                <filter string="📍 La Paz" name="dept_lapaz" domain="[('city', 'ilike', 'La Paz')]"/>
+                <filter string="📍 La Unión" name="dept_launion" domain="[('city', 'ilike', 'La Unión')]"/>
+                <filter string="📍 Morazán" name="dept_morazan" domain="[('city', 'ilike', 'Morazán')]"/>
+                <filter string="📍 San Miguel" name="dept_sanmiguel" domain="[('city', 'ilike', 'San Miguel')]"/>
+                <filter string="📍 San Salvador" name="dept_sansalvador" domain="[('city', 'ilike', 'San Salvador')]"/>
+                <filter string="📍 San Vicente" name="dept_sanvicente" domain="[('city', 'ilike', 'San Vicente')]"/>
+                <filter string="📍 Santa Ana" name="dept_santaana" domain="[('city', 'ilike', 'Santa Ana')]"/>
+                <filter string="📍 Sonsonate" name="dept_sonsonate" domain="[('city', 'ilike', 'Sonsonate')]"/>
+                <filter string="📍 Usulután" name="dept_usulutan" domain="[('city', 'ilike', 'Usulután')]"/>
+
+                <group expand="0" string="Agrupar Por">
+                    <filter string="Ciudad / Distrito" name="group_by_city" context="{'group_by': 'city'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Acción de Ventana para Clientes MasterShop -->
+    <record id="action_analitica_mastershop_clientes" model="ir.actions.act_window">
+        <field name="name">Clientes MasterShop</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_analitica_mastershop_clientes_list"/>
+        <field name="search_view_id" ref="view_analitica_mastershop_clientes_search"/>
+        <field name="domain">[('es_cliente_mastershop', '=', True)]</field>
+        <field name="context">{'create': False, 'edit': False, 'delete': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No se encontraron clientes identificados con la etiqueta Mastershop.
+            </p>
+            <p>
+                Asigna la etiqueta <strong>Mastershop</strong> a tus contactos de clientes para visualizarlos y analizarlos en esta sección.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_analitica_mastershop_clientes_view_list" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_analitica_mastershop_clientes_list"/>
+        <field name="act_window_id" ref="action_analitica_mastershop_clientes"/>
+    </record>
+</odoo>

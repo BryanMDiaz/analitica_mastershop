@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ============================================== -->
+    <!-- REPORTES DE VENTAS MASTERSHOP (ACCOUNT.MOVE)   -->
+    <!-- ============================================== -->
+
+    <!-- Vista Gráfico de Reportes de Ventas (Bar Chart por Mes) -->
+    <record id="view_mastershop_reportes_ventas_graph" model="ir.ui.view">
+        <field name="name">mastershop.reportes.ventas.graph</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <graph string="Reportes de Ventas" type="bar" sample="1">
+                <field name="invoice_date" interval="month"/>
+                <field name="amount_untaxed_signed" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Vista Pivote de Reportes de Ventas -->
+    <record id="view_mastershop_reportes_ventas_pivot" model="ir.ui.view">
+        <field name="name">mastershop.reportes.ventas.pivot</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <pivot string="Análisis de Ventas MasterShop" sample="1">
+                <field name="partner_id" type="row"/>
+                <field name="invoice_date" interval="month" type="col"/>
+                <field name="amount_untaxed_signed" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Vista Lista de Reportes de Ventas -->
+    <record id="view_mastershop_reportes_ventas_list" model="ir.ui.view">
+        <field name="name">mastershop.reportes.ventas.list</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <list string="Facturas de Venta - MasterShop" create="0" delete="0" default_order="invoice_date desc, id desc" sample="1">
+                <field name="company_currency_id" column_invisible="True"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="name" string="Número" readonly="1" decoration-bf="1"/>
+                <field name="invoice_date" string="Fecha"/>
+                <field name="partner_id" string="Cliente"/>
+                <field name="invoice_user_id" string="Comercial" optional="show"/>
+                <field name="vendedor_id" string="Vendedor (Comisión)" optional="show"/>
+                <field name="amount_untaxed_signed" string="Base Imponible" sum="Total Base Imponible" widget="monetary" decoration-bf="1"/>
+                <field name="amount_total_signed" string="Total Facturado" sum="Total Facturado" widget="monetary" decoration-bf="1"/>
+                <field name="payment_state" string="Estado de Pago" widget="badge"
+                       decoration-success="payment_state in ('paid', 'in_payment')"
+                       decoration-warning="payment_state == 'not_paid'"/>
+                <field name="state" string="Estado" widget="badge" decoration-success="state == 'posted'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Vista Búsqueda / Filtros para Reportes de Ventas -->
+    <record id="view_mastershop_reportes_ventas_search" model="ir.ui.view">
+        <field name="name">mastershop.reportes.ventas.search</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <search string="Filtros Reportes de Ventas">
+                <field name="name" string="Número / Factura"/>
+                <field name="partner_id" string="Cliente"/>
+                <field name="invoice_user_id" string="Comercial"/>
+                <field name="vendedor_id" string="Vendedor Comisionista"/>
+                <separator/>
+                <filter string="Facturas" name="filter_invoices" domain="[('move_type', '=', 'out_invoice')]"/>
+                <filter string="Notas de Crédito" name="filter_refunds" domain="[('move_type', '=', 'out_refund')]"/>
+                <separator/>
+                <filter string="Pagadas" name="filter_paid" domain="[('payment_state', 'in', ('paid', 'in_payment'))]"/>
+                <filter string="Pendientes de Pago" name="filter_unpaid" domain="[('payment_state', '=', 'not_paid')]"/>
+                <separator/>
+                <filter string="Año Actual" name="filter_current_year" domain="[('invoice_date', '&gt;=', context_today().strftime('%Y-01-01'))]"/>
+                <group expand="0" string="Agrupar Por">
+                    <filter string="Mes de Factura" name="group_month" context="{'group_by': 'invoice_date:month'}"/>
+                    <filter string="Cliente" name="group_partner" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Comercial" name="group_salesperson" context="{'group_by': 'invoice_user_id'}"/>
+                    <filter string="Vendedor (Comisión)" name="group_vendedor" context="{'group_by': 'vendedor_id'}"/>
+                    <filter string="Estado de Pago" name="group_payment" context="{'group_by': 'payment_state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Acción de Ventana para Reportes de Ventas (Gráfico, Pivote, Lista) -->
+    <record id="action_mastershop_reportes_ventas" model="ir.actions.act_window">
+        <field name="name">Reportes de Ventas</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">graph,pivot,list</field>
+        <field name="search_view_id" ref="view_mastershop_reportes_ventas_search"/>
+        <field name="domain">[
+            ('move_type', 'in', ('out_invoice', 'out_refund')),
+            ('state', '=', 'posted'),
+            ('company_id.name', 'ilike', 'GRUPO 2'),
+            ('partner_id.category_id.name', 'ilike', 'Mastershop'),
+            ('es_mastershop', '=', True)
+        ]</field>
+        <field name="context">{'create': False, 'search_default_filter_invoices': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No se encontraron ventas de MasterShop contabilizadas para GRUPO 2 S.A. DE C.V.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_mastershop_reportes_ventas_view_graph" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="view_mastershop_reportes_ventas_graph"/>
+        <field name="act_window_id" ref="action_mastershop_reportes_ventas"/>
+    </record>
+
+    <record id="action_mastershop_reportes_ventas_view_pivot" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">pivot</field>
+        <field name="view_id" ref="view_mastershop_reportes_ventas_pivot"/>
+        <field name="act_window_id" ref="action_mastershop_reportes_ventas"/>
+    </record>
+
+    <record id="action_mastershop_reportes_ventas_view_list" model="ir.actions.act_window.view">
+        <field name="sequence" eval="3"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_mastershop_reportes_ventas_list"/>
+        <field name="act_window_id" ref="action_mastershop_reportes_ventas"/>
+    </record>
+</odoo>

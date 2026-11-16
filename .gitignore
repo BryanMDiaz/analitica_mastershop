@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Entornos y configuración local
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+odoo.conf
+*.log
+
+# Datos locales y respaldos
+*.dump
+*.sql
+*.sqlite3
+filestore/
+
+# Editores y sistema operativo
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

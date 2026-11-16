@@ -1,0 +1,52 @@
+.o_mastershop_commissions {
+    .o_content {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .o_mastershop_liquidacion {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px 24px;
+        flex: 0 0 auto;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border-color, #dee2e6);
+        background: var(--o-view-background-color, #fff);
+    }
+
+    .o_mastershop_liquidacion_info {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .o_mastershop_liquidacion_controls {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .o_mastershop_tax {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        margin: 0;
+        border: 1px solid var(--border-color, #dee2e6);
+        border-radius: 6px;
+        cursor: pointer;
+
+        &.is-active {
+            background: rgba(0, 128, 128, 0.07);
+            border-color: #008080;
+        }
+    }
+
+    .o_list_renderer {
+        flex: 1 1 auto;
+        min-height: 0;
+    }
+}

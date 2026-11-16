@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista Lista -->
+    <record id="view_analitica_mastershop_list" model="ir.ui.view">
+        <field name="name">analitica.mastershop.list</field>
+        <field name="model">analitica.mastershop</field>
+        <field name="arch" type="xml">
+            <list string="Analítica MasterShop"
+                  decoration-info="state == 'draft'"
+                  decoration-warning="state == 'in_progress'"
+                  decoration-success="state == 'done'"
+                  decoration-muted="state == 'cancel'">
+                <field name="name" string="Código" decoration-bf="1"/>
+                <field name="tienda_nombre" string="Tienda / Sucursal"/>
+                <field name="analytic_account_id" string="Cuenta Analítica"/>
+                <field name="responsable_id" string="Responsable" widget="many2one_avatar_user"/>
+                <field name="fecha_inicio" string="Inicio"/>
+                <field name="fecha_fin" string="Fin" optional="show"/>
+                <field name="ventas_totales" string="Ventas Totales" sum="Total Ventas" decoration-success="ventas_totales &gt; 0"/>
+                <field name="costos_totales" string="Costos Operativos" sum="Total Costos" decoration-danger="costos_totales &gt; 0"/>
+                <field name="margen_bruto" string="Margen Bruto" sum="Margen Total" decoration-bf="1"/>
+                <field name="porcentaje_margen" string="% Margen" widget="percentage" optional="show"
+                       decoration-success="porcentaje_margen &gt;= 0.25"
+                       decoration-warning="porcentaje_margen &gt; 0 and porcentaje_margen &lt; 0.25"
+                       decoration-danger="porcentaje_margen &lt;= 0"/>
+                <field name="state" string="Estado" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state == 'in_progress'"
+                       decoration-success="state == 'done'"
+                       decoration-danger="state == 'cancel'"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Vista Gráfico -->
+    <record id="view_analitica_mastershop_graph" model="ir.ui.view">
+        <field name="name">analitica.mastershop.graph</field>
+        <field name="model">analitica.mastershop</field>
+        <field name="arch" type="xml">
+            <graph string="Métricas MasterShop" type="bar" sample="1">
+                <field name="tienda_nombre"/>
+                <field name="ventas_totales" type="measure"/>
+                <field name="costos_totales" type="measure"/>
+                <field name="margen_bruto" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Vista Pivote -->
+    <record id="view_analitica_mastershop_pivot" model="ir.ui.view">
+        <field name="name">analitica.mastershop.pivot</field>
+        <field name="model">analitica.mastershop</field>
+        <field name="arch" type="xml">
+            <pivot string="Análisis Financiero MasterShop" sample="1">
+                <field name="tienda_nombre" type="row"/>
+                <field name="state" type="col"/>
+                <field name="ventas_totales" type="measure"/>
+                <field name="costos_totales" type="measure"/>
+                <field name="margen_bruto" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Vista Formulario -->
+    <record id="view_analitica_mastershop_form" model="ir.ui.view">
+        <field name="name">analitica.mastershop.form</field>
+        <field name="model">analitica.mastershop</field>
+        <field name="arch" type="xml">
+            <form string="Analítica MasterShop">
+                <header>
+                    <button name="action_set_in_progress" string="Iniciar Operación" type="object"
+                            class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_set_done" string="Finalizar" type="object"
+                            class="oe_highlight" invisible="state != 'in_progress'"/>
+                    <button name="action_set_draft" string="Regresar a Borrador" type="object"
+                            invisible="state not in ('cancel', 'done')"/>
+                    <button name="action_set_cancel" string="Cancelar" type="object"
+                            invisible="state not in ('draft', 'in_progress')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,in_progress,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_analytic_lines" type="object" class="oe_stat_button"
+                                icon="fa-line-chart" invisible="not analytic_account_id">
+                            <field name="analytic_line_count" widget="statinfo" string="Apuntes Analíticos"/>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <label for="name" string="Código / Referencia"/>
+                        <h1>
+                            <field name="name" readonly="state != 'draft'"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Información General">
+                            <field name="tienda_nombre" placeholder="Ej. Sucursal Central, Tienda Online..."/>
+                            <field name="analytic_account_id" options="{'no_create': False}"/>
+                            <field name="responsable_id" widget="many2one_avatar_user"/>
+                        </group>
+                        <group string="Período y Control">
+                            <field name="fecha_inicio"/>
+                            <field name="fecha_fin"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page name="analitica_financiera" string="Métricas Financieras y Rendimiento">
+                            <div class="alert alert-info py-2 px-3 mb-3" role="alert" style="border-left: 4px solid #008784;">
+                                📊 <strong>Control Analítico MasterShop:</strong> Registra las ventas y costos para obtener el margen bruto y el porcentaje de rentabilidad en tiempo real.
+                            </div>
+                            <group>
+                                <group string="Ingresos y Ventas">
+                                    <field name="ventas_totales" widget="monetary" decoration-success="ventas_totales &gt; 0"/>
+                                </group>
+                                <group string="Costos y Gastos">
+                                    <field name="costos_totales" widget="monetary" decoration-danger="costos_totales &gt; 0"/>
+                                </group>
+                            </group>
+                            <group string="Rentabilidad y Márgenes">
+                                <group>
+                                    <field name="margen_bruto" widget="monetary" decoration-bf="1"/>
+                                    <field name="porcentaje_margen" widget="percentage"
+                                           decoration-success="porcentaje_margen &gt;= 0.25"
+                                           decoration-warning="porcentaje_margen &gt; 0 and porcentaje_margen &lt; 0.25"
+                                           decoration-danger="porcentaje_margen &lt;= 0"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page name="notas" string="Estrategia y Notas">
+                            <field name="notas" placeholder="Detalles de la estrategia de ventas, objetivos del período, etc..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vista Búsqueda -->
+    <record id="view_analitica_mastershop_search" model="ir.ui.view">
+        <field name="name">analitica.mastershop.search</field>
+        <field name="model">analitica.mastershop</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Registros MasterShop">
+                <field name="name" string="Código / Referencia"/>
+                <field name="tienda_nombre" string="Tienda / Sucursal"/>
+                <field name="analytic_account_id" string="Cuenta Analítica"/>
+                <field name="responsable_id" string="Responsable"/>
+                <separator/>
+                <filter string="Borradores" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="En Operación" name="filter_in_progress" domain="[('state', '=', 'in_progress')]"/>
+                <filter string="Finalizados" name="filter_done" domain="[('state', '=', 'done')]"/>
+                <separator/>
+                <filter string="Margen Positivo" name="filter_positive_margin" domain="[('margen_bruto', '&gt;', 0)]"/>
+                <filter string="Margen Negativo" name="filter_negative_margin" domain="[('margen_bruto', '&lt;=', 0)]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter string="Estado" name="group_by_state" context="{'group_by': 'state'}"/>
+                    <filter string="Responsable" name="group_by_responsable" context="{'group_by': 'responsable_id'}"/>
+                    <filter string="Cuenta Analítica" name="group_by_analytic_account" context="{'group_by': 'analytic_account_id'}"/>
+                    <filter string="Mes de Inicio" name="group_by_fecha" context="{'group_by': 'fecha_inicio:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Acción de Ventana -->
+    <record id="action_analitica_mastershop" model="ir.actions.act_window">
+        <field name="name">Analítica MasterShop</field>
+        <field name="res_model">analitica.mastershop</field>
+        <field name="view_mode">list,pivot,graph,form</field>
+        <field name="search_view_id" ref="view_analitica_mastershop_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crea tu primer registro de análisis para MasterShop
+            </p>
+            <p>
+                Gestiona y analiza las ventas, costos operativos y márgenes de rentabilidad de tus tiendas con integración analítica.
+            </p>
+        </field>
+    </record>
+</odoo>

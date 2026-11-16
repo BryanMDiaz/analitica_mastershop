@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_analitica_mastershop_user,analitica.mastershop.user,model_analitica_mastershop,group_analitica_mastershop_user,1,1,1,0
+access_analitica_mastershop_manager,analitica.mastershop.manager,model_analitica_mastershop,group_analitica_mastershop_manager,1,1,1,1
+access_analitica_mastershop_base,analitica.mastershop.base,model_analitica_mastershop,base.group_user,1,1,1,0
+access_mastershop_comision_reporte_user,mastershop.comision.reporte.user,model_mastershop_comision_reporte,base.group_user,1,0,0,0
+access_mastershop_comision_descuento_user,mastershop.comision.descuento.user,model_mastershop_comision_descuento,base.group_user,1,1,1,1
+access_mastershop_comision_descuento_wizard_user,mastershop.comision.descuento.wizard.user,model_mastershop_comision_descuento_wizard,base.group_user,1,1,1,1
+
+access_mastershop_comision_regla_user,mastershop.comision.regla.user,model_mastershop_comision_regla,base.group_user,1,0,0,0
+access_mastershop_comision_regla_manager,mastershop.comision.regla.manager,model_mastershop_comision_regla,group_analitica_mastershop_manager,1,1,1,1

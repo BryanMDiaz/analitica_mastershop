@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Vista Kanban Personalizada para Productos MasterShop -->
+        <record id="view_mastershop_product_kanban" model="ir.ui.view">
+            <field name="name">mastershop.product.kanban</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_kanban_view"/>
+            <field name="mode">primary</field>
+            <field name="arch" type="xml">
+                <xpath expr="//kanban" position="inside">
+                    <field name="qty_available"/>
+                    <field name="uom_id"/>
+                </xpath>
+                <xpath expr="//div[hasclass('mb-1')]" position="after">
+                    <div class="mt-2 mb-2">
+                        <!-- Bajo stock: 5 o menos -->
+                        <span t-if="record.qty_available.raw_value &lt;= 5" class="badge text-bg-danger" style="font-size: 12px; padding: 5px;">
+                            Stock: <field name="qty_available"/> <field name="uom_id"/>
+                        </span>
+                        <!-- Medio stock: mayor a 5 y hasta 50 -->
+                        <span t-if="record.qty_available.raw_value &gt; 5 and record.qty_available.raw_value &lt;= 50" class="badge text-bg-warning" style="font-size: 12px; padding: 5px;">
+                            Stock: <field name="qty_available"/> <field name="uom_id"/>
+                        </span>
+                        <!-- Alto stock: mayor a 50 -->
+                        <span t-if="record.qty_available.raw_value &gt; 50" class="badge text-bg-success" style="font-size: 12px; padding: 5px;">
+                            Stock: <field name="qty_available"/> <field name="uom_id"/>
+                        </span>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Vista Lista Personalizada para Inventario MasterShop -->
+        <record id="view_mastershop_product_list" model="ir.ui.view">
+            <field name="name">mastershop.product.list</field>
+            <field name="model">product.template</field>
+            <field name="arch" type="xml">
+                <list string="Inventario MasterShop" sample="1">
+                    <field name="default_code" string="Código / Ref." optional="show"/>
+                    <field name="name" string="Producto"/>
+                    <field name="categ_id" string="Categoría" optional="show"/>
+                    <field name="list_price" string="Precio de Venta" widget="monetary"/>
+                    <field name="currency_id" column_invisible="True"/>
+                    <field name="qty_available" string="Stock" decoration-danger="qty_available &lt;= 5" decoration-warning="qty_available &gt; 5 and qty_available &lt;= 50" decoration-success="qty_available &gt; 50"/>
+                    <field name="uom_id" string="UdM" groups="uom.group_uom" optional="show"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Vista Búsqueda y Filtros de Inventario MasterShop -->
+        <record id="view_mastershop_product_search" model="ir.ui.view">
+            <field name="name">mastershop.product.search</field>
+            <field name="model">product.template</field>
+            <field name="arch" type="xml">
+                <search string="Filtros de Inventario MasterShop">
+                    <field name="name" string="Producto" filter_domain="['|', ('name', 'ilike', self), ('default_code', 'ilike', self)]"/>
+                    <field name="default_code" string="Código"/>
+                    <field name="categ_id" string="Categoría"/>
+                    
+                    <separator/>
+                    <filter string="Bajo Stock (≤ 5)" name="filter_low_stock" domain="[('qty_available', '&lt;=', 5)]"/>
+                    <filter string="Stock Medio (5 a 50)" name="filter_medium_stock" domain="[('qty_available', '&gt;', 5), ('qty_available', '&lt;=', 50)]"/>
+                    <filter string="Alto Stock (+50)" name="filter_high_stock" domain="[('qty_available', '&gt;', 50)]"/>
+                    <separator/>
+                    <filter string="Agotado (0)" name="filter_out_of_stock" domain="[('qty_available', '&lt;=', 0)]"/>
+                    
+                    <group expand="0" string="Agrupar Por">
+                        <filter string="Categoría" name="group_by_category" context="{'group_by': 'categ_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Acción de Ventana para Inventario MasterShop -->
+        <record id="action_mastershop_inventario" model="ir.actions.act_window">
+            <field name="name">Productos MasterShop</field>
+            <field name="res_model">product.template</field>
+            <field name="view_mode">kanban,list,form</field>
+            <field name="domain">['|', '|', ('categ_id.name', 'ilike', 'mastershop'), ('categ_id.name', 'ilike', 'master shop'), ('categ_id.complete_name', 'ilike', 'master')]</field>
+            <field name="search_view_id" ref="view_mastershop_product_search"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No hay productos de MasterShop registrados todavía.
+                </p>
+            </field>
+        </record>
+
+        <!-- Conexión explícita de vistas Kanban y Lista a la Acción -->
+        <record id="action_mastershop_inventario_kanban" model="ir.actions.act_window.view">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">kanban</field>
+            <field name="view_id" ref="view_mastershop_product_kanban"/>
+            <field name="act_window_id" ref="action_mastershop_inventario"/>
+        </record>
+
+        <record id="action_mastershop_inventario_list" model="ir.actions.act_window.view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">list</field>
+            <field name="view_id" ref="view_mastershop_product_list"/>
+            <field name="act_window_id" ref="action_mastershop_inventario"/>
+        </record>
+    </data>
+</odoo>
